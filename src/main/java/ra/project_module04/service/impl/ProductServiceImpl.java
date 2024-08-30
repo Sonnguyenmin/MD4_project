@@ -17,6 +17,7 @@ import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.ProductRequest;
 import ra.project_module04.model.entity.Category;
 import ra.project_module04.model.entity.Product;
+import ra.project_module04.repository.ICategoryRepository;
 import ra.project_module04.repository.IProductRepository;
 import ra.project_module04.service.ICategoryService;
 import ra.project_module04.service.IProductService;
@@ -30,14 +31,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
     private final IProductRepository productRepository;
+    private final ICategoryRepository categoryRepository;
 
     private final ICategoryService categoryService;
 
     private final UploadFile uploadFile;
 
     @Override
-    public List<Product> getAllProduct() {
-        return productRepository.findAll();
+    public Page<Product> getAllProduct(Pageable pageable, String search) {
+        Page<Product> products;
+        if(search == null || search.isEmpty()) {
+            products = productRepository.findAll(pageable);
+        }else{
+            products = productRepository.findProductByProductNameContainsIgnoreCase(search,pageable);
+        }
+        return products;
     }
 
     @Override
@@ -56,6 +64,7 @@ public class ProductServiceImpl implements IProductService {
                 .unitPrice(product.getUnitPrice())
                 .stockQuantity(product.getStockQuantity())
                 .image(uploadFile.uploadLocal(product.getImage()))
+                .status(product.getStatus())
                 .createdAt(new Date())
                 .updatedAt(new Date())
                 .build();
@@ -77,6 +86,7 @@ public class ProductServiceImpl implements IProductService {
                 .unitPrice(product.getUnitPrice())
                 .stockQuantity(product.getStockQuantity())
                 .image(uploadFile.uploadLocal(product.getImage()))
+                .status(product.getStatus())
                 .createdAt(new Date())
                 .updatedAt(new Date())
                 .build();
@@ -116,5 +126,40 @@ public class ProductServiceImpl implements IProductService {
         } else {
             return productRepository.findAllByProductNameContains(searchName, pageable);
         }
+    }
+
+    @Override
+    public List<Product> findProductByProductNameOrDescription(String search) {
+        return productRepository.findByProductNameOrDescriptionContaining(search);
+    }
+
+    @Override
+    public List<Product> findProductByCategoryId(Long id) {
+        // Kiểm tra xem danh mục có tồn tại không
+        if (!categoryRepository.existsById(id)) {
+            throw new NoSuchElementException("Không tìm thấy danh mục với ID: " + id);
+        }
+
+        // Lấy danh sách sản phẩm thuộc danh mục
+        List<Product> products = productRepository.findProductsByCategory_Id(id);
+
+        // Kiểm tra nếu không có sản phẩm nào
+        if (products.isEmpty()) {
+            throw new NoSuchElementException("Danh mục với ID: " + id + " không có sản phẩm nào.");
+        }
+        return products;
+    }
+
+    @Override
+    public List<Product> getLatestProduct() {
+       // return productRepository.getLatestProducts(PageRequest.of(0,5));
+        //return  productRepository.findTop5ByOrderByCreatedAtDesc();
+        return productRepository.findTop5ByOrderByIdDesc();
+    }
+
+
+    @Override
+    public Page<Product> listProductsForSale(Pageable pageable) {
+        return productRepository.findProductByStatusTrue(pageable);
     }
 }

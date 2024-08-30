@@ -2,7 +2,7 @@ package ra.project_module04.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ra.project_module04.constans.RoleName;
+import ra.project_module04.constants.RoleName;
 
 @Entity
 @NoArgsConstructor

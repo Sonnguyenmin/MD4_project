@@ -24,7 +24,7 @@ public class FormRegister {
     private String username;
 
     @NotBlank(message = "Email không được để trống")
-//    @Pattern(regexp ="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}$", message = "email không đúng định dạng")
+    @Pattern(regexp ="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "email không đúng định dạng")
     private String email;
 
     @NotBlank(message = "Họ và tên không được để trống")

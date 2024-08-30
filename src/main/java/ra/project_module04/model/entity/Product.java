@@ -51,4 +51,6 @@ public class Product {
     @JsonFormat(pattern = "dd/MM/yyyy")
     @Temporal(TemporalType.DATE)
     private Date updatedAt;
+
+    private Boolean status;
 }

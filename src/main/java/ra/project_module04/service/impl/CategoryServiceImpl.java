@@ -70,26 +70,42 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public Page<Category> getCategoryWithPaginationAndSorting(Integer page, Integer pageSize, String sortBy, String orderBy, String searchName) {
         Pageable pageable;
+        // Xác định cách sắp xếp
         if (!sortBy.isEmpty()) {
             Sort sort;
             switch (sortBy) {
                 case "asc":
-                    sort = Sort.by(sortBy).ascending();
+                    sort = Sort.by(orderBy).ascending();
                     break;
                 case "desc":
-                    sort = Sort.by(sortBy).descending();
+                    sort = Sort.by(orderBy).descending();
                     break;
                 default:
-                    sort = Sort.by(sortBy).ascending();
+                    sort = Sort.by(orderBy).ascending();
             }
             pageable = PageRequest.of(page, pageSize, sort);
         } else {
             pageable = PageRequest.of(page, pageSize);
         }
+
+        // Tìm danh mục
+        Page<Category> categoriesPage;
         if (searchName.isEmpty()) {
-            return categoryRepository.findAll(pageable);
+            categoriesPage = categoryRepository.findAll(pageable);
         } else {
-            return categoryRepository.findAllByCategoryNameContains(searchName, pageable);
+            categoriesPage = categoryRepository.findAllByCategoryNameContains(searchName, pageable);
         }
+
+        // Kiểm tra nếu không có danh mục
+        if (categoriesPage.isEmpty()) {
+            throw new NoSuchElementException("Không tìm thấy danh mục");
+        }
+
+        return categoriesPage;
+    }
+
+    @Override
+    public Page<Category> listCategoriesForSale(Pageable pageable) {
+        return categoryRepository.findCategoriesByStatusTrue(pageable);
     }
 }

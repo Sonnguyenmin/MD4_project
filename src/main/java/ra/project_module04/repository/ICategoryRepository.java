@@ -12,4 +12,7 @@ public interface ICategoryRepository extends JpaRepository<Category, Long> {
     //@Query("select c from Category c where c.categoryName like concat('%',:categoryName,'%')")
     Page<Category> findAllByCategoryNameContains(String categoryName, Pageable pageable);
     boolean existsByCategoryName(String categoryName);
+    boolean existsById(Long id);
+
+    Page<Category> findCategoriesByStatusTrue(Pageable pageable);
 }

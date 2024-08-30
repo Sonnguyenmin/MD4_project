@@ -2,6 +2,9 @@ package ra.project_module04.controller.admin;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +20,8 @@ public class ProductController {
     private final ProductServiceImpl productService;
 
     @GetMapping
-    public ResponseEntity<DataResponse> getAllProducts() {
-        return new ResponseEntity<>(new DataResponse(productService.getAllProduct(), HttpStatus.OK), HttpStatus.OK);
+    public ResponseEntity<DataResponse> getAllProducts(@PageableDefault(page = 0,size = 2, sort = "id",direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(defaultValue = "" ) String search) {
+        return new ResponseEntity<>(new DataResponse(productService.getAllProduct(pageable,search),HttpStatus.OK),HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

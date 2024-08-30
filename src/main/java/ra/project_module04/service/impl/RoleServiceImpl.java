@@ -2,7 +2,7 @@ package ra.project_module04.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ra.project_module04.constans.RoleName;
+import ra.project_module04.constants.RoleName;
 import ra.project_module04.model.entity.Roles;
 import ra.project_module04.repository.IRoleRepository;
 import ra.project_module04.service.IRoleService;

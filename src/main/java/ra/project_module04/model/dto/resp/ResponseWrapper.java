@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ra.project_module04.constans.EHttpStatus;
+import ra.project_module04.constants.EHttpStatus;
 
 
 @NoArgsConstructor

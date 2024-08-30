@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.resp.DataResponse;
 import ra.project_module04.model.entity.Roles;
 import ra.project_module04.model.entity.Users;
@@ -22,7 +23,7 @@ public class AdminController {
     private final IRoleService roleService;
 
     @GetMapping
-    public  ResponseEntity<?> admin() {
+    public ResponseEntity<?> admin() {
         return ResponseEntity.ok().body("Chào mừng đến với trang quản trị");
     }
 
@@ -44,7 +45,7 @@ public class AdminController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Users> changeUserStatus(@PathVariable Long id, @RequestParam Boolean status) {
+    public ResponseEntity<Users> changeUserStatus(@PathVariable Long id, @RequestParam Boolean status) throws CustomException {
         Users changeUserStatus = userService.updateUserStatus(id, status);
         return new ResponseEntity<>(changeUserStatus, HttpStatus.OK);
     }

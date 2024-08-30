@@ -10,7 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ra.project_module04.constans.RoleName;
+import ra.project_module04.constants.RoleName;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.FormLogin;
 import ra.project_module04.model.dto.req.FormRegister;
@@ -23,7 +23,6 @@ import ra.project_module04.security.jwt.JwtProvider;
 import ra.project_module04.security.principle.MyUserDetailCustom;
 import ra.project_module04.service.IAuthService;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.NoSuchElementException;

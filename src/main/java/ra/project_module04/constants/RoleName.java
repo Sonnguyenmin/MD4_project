@@ -1,4 +1,4 @@
-package ra.project_module04.constans;
+package ra.project_module04.constants;
 
 public enum RoleName {
     ROLE_ADMIN,

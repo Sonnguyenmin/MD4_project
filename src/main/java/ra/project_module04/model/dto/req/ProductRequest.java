@@ -49,4 +49,6 @@ public class ProductRequest {
     @JsonFormat(pattern = "dd/MM/yyyy")
 //    @Past(message = "Ngày cập nhật không hợp lệ")
     private Date updatedAt;
+
+    private Boolean status;
 }
