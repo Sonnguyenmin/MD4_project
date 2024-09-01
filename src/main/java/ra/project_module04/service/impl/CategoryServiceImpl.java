@@ -1,25 +1,32 @@
 package ra.project_module04.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.CategoryRequest;
 import ra.project_module04.model.entity.Category;
 import ra.project_module04.repository.ICategoryRepository;
+import ra.project_module04.repository.IProductRepository;
 import ra.project_module04.service.ICategoryService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements ICategoryService {
-    @Autowired
-    private ICategoryRepository categoryRepository;
+
+    private final ICategoryRepository categoryRepository;
+
+    private final IProductRepository productRepository;
+
 
     @Override
     public List<Category> getAllCategories() {
@@ -62,8 +69,13 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public void deleteCategory(Long id) {
+    public void deleteCategory(Long id) throws CustomException {
         categoryRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Khong ton tai danh mục: " + id));
+
+        if(productRepository.existsByCategory_Id(id)) {
+            throw new AccessDeniedException("Không thể xóa danh mục vì nó có sản phẩm");
+        }
+
         categoryRepository.deleteById(id);
     }
 

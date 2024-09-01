@@ -43,11 +43,11 @@ public class Users {
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     @Temporal(TemporalType.DATE)
-    private Date createdDate;
+    private Date createdAt;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     @Temporal(TemporalType.DATE)
-    private Date updatedDate;
+    private Date updatedAt;
 
     private Boolean status;
 

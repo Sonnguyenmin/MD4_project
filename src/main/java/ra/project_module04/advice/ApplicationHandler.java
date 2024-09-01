@@ -3,8 +3,10 @@ package ra.project_module04.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ra.project_module04.constants.EHttpStatus;
 import ra.project_module04.exception.CustomException;
@@ -44,7 +46,6 @@ public class ApplicationHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ResponseWrapper> handleNoSuchElementException(NoSuchElementException ex) {
-        // Giả sử bạn đã định nghĩa EHttpStatus để phản ánh trạng thái HTTP
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.FAILED) // Cần phải có định nghĩa cho EHttpStatus
@@ -55,18 +56,15 @@ public class ApplicationHandler {
         );
     }
 
-//    @ExceptionHandler(AuthenticationException.class)
-//    public ResponseEntity<?> handleAuthenException(AuthenticationException e) {
-//        Map<String,Object> map = new HashMap<>();
-//        map.put("error",new CustomException(400,"BAD_REQUEST",e));
-//        return ResponseEntity.badRequest().body(map);
-//    }
-//
-//    @ExceptionHandler(AccessDeniedException.class)
-//    @ResponseStatus(HttpStatus.FORBIDDEN)
-//    public Map<String,Object> forbidden(AccessDeniedException e){
-//        Map<String,Object> map = new HashMap<>();
-//        map.put("error",new CustomException(403,"FOR_BIDDEN",e.getMessage()));
-//        return  map;
-//    }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseWrapper> handleAccessDeniedException(AccessDeniedException ex) {
+        return new ResponseEntity<>(
+                ResponseWrapper.builder()
+                        .eHttpStatus(EHttpStatus.FORBIDDEN)
+                        .statusCode(HttpStatus.FORBIDDEN.value())
+                        .data(ex.getMessage() != null ? ex.getMessage() : "Access denied")
+                        .build(),
+                HttpStatus.FORBIDDEN
+        );
+    }
 }

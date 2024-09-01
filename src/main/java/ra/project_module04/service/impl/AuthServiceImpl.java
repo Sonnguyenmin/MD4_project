@@ -51,6 +51,14 @@ public class AuthServiceImpl implements IAuthService {
             throw new CustomException("Tên đăng nhập đã tồn tại",HttpStatus.CONFLICT);
         }
 
+        if(userRepository.existsByPhone(formRegister.getPhone())) {
+            throw new CustomException("Số điện thoại đã tồn tại", HttpStatus.CONFLICT);
+        }
+
+        if (userRepository.existsByEmail(formRegister.getEmail())) {
+            throw new CustomException("Email đã tồn tại", HttpStatus.CONFLICT);
+        }
+
         Users user = Users.builder()
                 .email(formRegister.getEmail())
                 .fullName(formRegister.getFullName())
@@ -58,8 +66,8 @@ public class AuthServiceImpl implements IAuthService {
                 .password(passwordEncoder.encode(formRegister.getPassword()))
                 .phone(formRegister.getPhone())
                 .status(true)
-                .createdDate(new Date())
-                .updatedDate(new Date())
+                .createdAt(new Date())
+                .updatedAt(new Date())
                 .isDeleted(false)
                 .build();
         if (formRegister.getRoles()!=null && !formRegister.getRoles().isEmpty()){
@@ -99,11 +107,8 @@ public class AuthServiceImpl implements IAuthService {
             throw new CustomException("Tên người dùng hoặc mật khẩu không đúng",HttpStatus.BAD_REQUEST);
             //409: Lỗi không hợp lệ
         }
-
         MyUserDetailCustom userDetailCustom = (MyUserDetailCustom) authentication.getPrincipal();
-
         String accessToken = jwtProvider.generateAccessToken(userDetailCustom);
-
         return JwtResponse.builder()
                 .accessToken(accessToken)
                 .username(userDetailCustom.getUsername())

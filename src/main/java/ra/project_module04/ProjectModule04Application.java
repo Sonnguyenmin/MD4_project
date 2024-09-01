@@ -1,7 +1,18 @@
 package ra.project_module04;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import ra.project_module04.constants.RoleName;
+import ra.project_module04.model.entity.Roles;
+import ra.project_module04.model.entity.Users;
+import ra.project_module04.repository.IUserRepository;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @SpringBootApplication
 public class ProjectModule04Application {

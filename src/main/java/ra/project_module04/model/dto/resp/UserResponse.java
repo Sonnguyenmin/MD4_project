@@ -1,5 +1,6 @@
 package ra.project_module04.model.dto.resp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,10 +22,9 @@ public class UserResponse {
     private String phone;
     private String address;
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date createdAt;
-
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     @Temporal(TemporalType.DATE)
     private Date updatedAt;
     private String isDeleted;

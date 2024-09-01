@@ -39,8 +39,6 @@ public class AdminController {
                                                             @RequestParam(name = "pageSize", defaultValue = "2")Integer pageSize,
                                                             @RequestParam(name = "sortBy", defaultValue = "")String sortBy,
                                                             @RequestParam(name = "orderBy", defaultValue = "asc")String orderBy){
-
-
         return new ResponseEntity<>(new DataResponse(userService.getUsersWithPaginationAndSorting(page, pageSize, sortBy, orderBy, searchName).getContent(),HttpStatus.OK),HttpStatus.OK);
     }
 

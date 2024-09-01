@@ -61,4 +61,5 @@ public class UserController {
     public ResponseEntity<DataResponse> getProductForSale(@PageableDefault(page = 0,size = 2, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return new ResponseEntity<>(new DataResponse(productService.listProductsForSale(pageable), HttpStatus.OK),HttpStatus.OK);
     }
+
 }

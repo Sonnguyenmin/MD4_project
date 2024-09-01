@@ -2,7 +2,6 @@ package ra.project_module04.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.ProductRequest;
 import ra.project_module04.model.entity.Product;

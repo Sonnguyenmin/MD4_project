@@ -10,9 +10,11 @@ import ra.project_module04.model.entity.Product;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Long> {
+    Optional<Product> findById(Long id);
     List<Product> findProductsByCategory_Id(Long id);
     Page<Product> findProductByProductNameContainsIgnoreCase(String productName, Pageable pageable);
     //@Query("select p from Product p where p.productName like concat('%',:productName,'%')")
@@ -23,6 +25,9 @@ public interface IProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByProductNameOrDescriptionContaining(@Param("keyword") String search);
 
     Page<Product> findProductByStatusTrue(Pageable pageable);
+
+    boolean existsByCategory_Id(Long id);
+
 //    @Query("select p from Product p order by p.createdAt asc")
 //    List<Product> getLatestProducts(Pageable pageable);
 //    List<Product> findTop5ByOrderByCreatedAtDesc();
