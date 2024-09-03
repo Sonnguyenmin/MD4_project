@@ -13,7 +13,6 @@ import java.util.List;
 
 public class OrderRequest {
     private Long userId;
-    private List<OrderItemCart> itemsCart;
     private String receiveName;
     private String receiveAddress;
     private String receivePhone;

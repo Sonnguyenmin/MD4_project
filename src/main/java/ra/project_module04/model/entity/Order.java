@@ -1,6 +1,7 @@
 package ra.project_module04.model.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,13 +50,15 @@ public class Order {
     @Column( length = 100)
     private String note;
 
+    @JsonFormat(pattern = "dd/MM/yyyy")
     @Column(nullable = false)
     private Date createdAt;
 
+    @JsonFormat(pattern = "dd/MM/yyyy")
     @Column( nullable = false)
     private Date receivedAt;
 
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
      List<OrderDetails> orderDetails;
 
 }

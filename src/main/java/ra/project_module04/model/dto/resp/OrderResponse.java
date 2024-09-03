@@ -44,6 +44,5 @@ public class OrderResponse {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Date receivedAt;
 
-    private List<OrderDetailResponse> products;
-
+    private List<OrderDetailResponse> orderDetail;
 }

@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ra.project_module04.constants.EHttpStatus;
 import ra.project_module04.exception.CustomException;
@@ -29,6 +28,18 @@ public class ApplicationHandler {
                         .statusCode(HttpStatus.BAD_REQUEST.value())
                         .data(errors)
                         .build()
+        );
+    }
+
+    @ExceptionHandler(SuccessException.class)
+    public ResponseEntity<?> handleSuccessException(SuccessException ex) {
+        return new ResponseEntity<>(
+                ResponseWrapper.builder()
+                        .eHttpStatus(EHttpStatus.SUCCESS)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(ex.getMessage())
+                        .build(),
+                HttpStatus.OK
         );
     }
 

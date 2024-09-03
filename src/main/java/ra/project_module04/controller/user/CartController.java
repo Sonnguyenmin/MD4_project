@@ -32,13 +32,13 @@ public class CartController {
     @DeleteMapping("/cart/{id}")
     public ResponseEntity<DataResponse> removeFromCart(@PathVariable Long id){
         cartService.removeProductToCart(id);
-        return new ResponseEntity<>(new DataResponse("Đã xóa thành công sản phẩm trong giỏ hàng có ID : "+id, HttpStatus.NO_CONTENT), HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse("Đã xóa thành công sản phẩm trong giỏ hàng có ID : "+id, HttpStatus.OK), HttpStatus.OK);
     }
 
     @DeleteMapping("/cart/deleteAllProduct")
     public ResponseEntity<DataResponse> deleteAllProduct(){
         cartService.removeAllProductToCart();
-        return new ResponseEntity<>(new DataResponse("Đã xóa thành công tất cả sản phẩm trong giỏ hàng", HttpStatus.NO_CONTENT), HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse("Đã xóa thành công tất cả sản phẩm trong giỏ hàng", HttpStatus.OK), HttpStatus.OK);
     }
 
     @PutMapping("/cart/cartUpdateQuantity/{id}")

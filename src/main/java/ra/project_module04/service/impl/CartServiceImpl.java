@@ -2,6 +2,7 @@ package ra.project_module04.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ra.project_module04.advice.SuccessException;
 import ra.project_module04.model.dto.req.AddToCartRequest;
 import ra.project_module04.model.dto.resp.CartResponse;
 import ra.project_module04.model.entity.Product;
@@ -62,10 +63,14 @@ public class CartServiceImpl implements ICartService {
     public List<CartResponse> getCart() {
         Users user = userService.getCurrentLoggedInUser();
         List<ShoppingCart> shoppingCarts = cartRepository.findAllByUsers(user);
+        if (shoppingCarts.isEmpty()) {
+            throw new SuccessException("Giỏ hàng trống");
+        }
         return shoppingCarts.stream().map(cart -> CartResponse.builder()
                         .id(cart.getId())
-                        .productId(cart.getId())
+                        .productId(cart.getProduct().getId())
                         .productName(cart.getProduct().getProductName())
+                        .unitPrice(cart.getProduct().getUnitPrice())
                         .orderQuantity(cart.getOrderQuantity())
                         .build())
                 .collect(Collectors.toList());
