@@ -15,10 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.ProductRequest;
-import ra.project_module04.model.entity.Category;
-import ra.project_module04.model.entity.Product;
-import ra.project_module04.repository.ICategoryRepository;
-import ra.project_module04.repository.IProductRepository;
+import ra.project_module04.model.entity.*;
+import ra.project_module04.repository.*;
 import ra.project_module04.service.ICategoryService;
 import ra.project_module04.service.IProductService;
 
@@ -36,6 +34,13 @@ public class ProductServiceImpl implements IProductService {
     private final ICategoryService categoryService;
 
     private final UploadFile uploadFile;
+
+    private final IWishListRepository wishListRepository;
+
+    private final IOrderDetailRepository orderDetailRepository;
+
+    private final ICartRepository cartRepository;
+
 
     @Override
     public Page<Product> getAllProduct(Pageable pageable, String search) {
@@ -98,8 +103,24 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void deleteProduct(Long id) {
-        productRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Không tồn tại sản phẩm: " + id));
+    public void deleteProduct(Long id) throws CustomException {
+       Product product = productRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Không tồn tại sản phẩm: " + id));
+
+        List<ShoppingCart> shoppingCarts = cartRepository.findByProduct(product);
+        if (!shoppingCarts.isEmpty()) {
+            throw new CustomException("Không thể xóa sản phẩm, Sản phẩm đã tồn tại trong giỏ hàng", HttpStatus.BAD_REQUEST);
+        }
+
+        List<OrderDetails> orderDetails = orderDetailRepository.findByProduct(product);
+        if (!orderDetails.isEmpty()) {
+            throw new CustomException("Không thể xóa sản phẩm, Sản phẩm đã tồn tại trong đơn hàng", HttpStatus.BAD_REQUEST);
+        }
+
+        List<WishList> wishList = wishListRepository.findByProduct(product);
+        if(!wishList.isEmpty()) {
+            throw new CustomException("Không thể xóa sản phẩm, Sản phẩm đã tồn tại trong sản phẩm yêu thích", HttpStatus.BAD_REQUEST);
+        }
+
         productRepository.deleteById(id);
     }
 

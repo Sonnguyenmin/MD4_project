@@ -6,14 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ra.project_module04.constants.OrderStatus;
 import ra.project_module04.model.dto.req.UDOrderStatusReq;
-import ra.project_module04.model.dto.resp.OrderDetailResponse;
 import ra.project_module04.model.dto.resp.OrderResponse;
 import ra.project_module04.model.entity.Order;
 import ra.project_module04.service.impl.OrderServiceImpl;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api.example.com/v1/admin/order")
@@ -27,18 +25,17 @@ public class OrderAdminController {
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/orderById/{id}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
         OrderResponse orderResponse = orderService.getOrderById(id);
         return ResponseEntity.ok(orderResponse);
     }
 
-
-//    @GetMapping("/{status}")
-//    public ResponseEntity<List<OrderResponse>> getOrderByStatus(@PathVariable OrderStatus status){
-//        List<OrderResponse> orderResponses = orderService.getOrderResponsesByStatus(status);
-//        return ResponseEntity.ok(orderResponses);
-//    }
+    @GetMapping("orderStatus/{status}")
+    public ResponseEntity<List<OrderResponse>> getOrderByStatus(@PathVariable OrderStatus status){
+        List<OrderResponse> orderResponses = orderService.getOrderResponsesByStatus(status);
+        return ResponseEntity.ok(orderResponses);
+    }
 
     @PutMapping("/status/{id}")
     public ResponseEntity<?> updateOrderStatus( @PathVariable Long id, @RequestBody UDOrderStatusReq status) {

@@ -16,4 +16,6 @@ public interface ICartRepository extends JpaRepository<ShoppingCart , Long> {
     Optional<ShoppingCart> findByUsersAndProduct(Users users, Product product);
 
     Optional<ShoppingCart> findByIdAndUsers(Long id, Users users);
+
+    List<ShoppingCart> findByProduct(Product product);
 }

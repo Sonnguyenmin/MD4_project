@@ -28,10 +28,8 @@ public class OrderController {
         return new ResponseEntity<>(new DataResponse(orderService.orderNow(orderRequest), HttpStatus.OK), HttpStatus.OK);
     }
 
-
-
     //Lấy ra danh sách lịch sử mua hàng theo trạng thái đơn hàng
-    @GetMapping("/order/history/{orderStatus}")
+    @GetMapping("/order/historyStatus/{orderStatus}")
     public ResponseEntity<List<OrderResponse>> getOrderHistoryByStatus(@PathVariable OrderStatus orderStatus) {
         List<Order> order = orderService.getOrdersByStatus(orderStatus);
         List<OrderResponse> listOrderResponse = order.stream().map(OrderConverterResponse::changeOrderResponse)
@@ -40,7 +38,7 @@ public class OrderController {
     }
 
     //Hủy đơn hàng đang chờ xác nhận
-    @PutMapping("/order/history/cancel/{id}")
+    @PutMapping("/order/historyUser/cancel/{id}")
     public ResponseEntity<?> cancelOrder(@PathVariable Long id) {
         boolean result = orderService.cancelOrder(id);
         if (result) {
@@ -50,20 +48,19 @@ public class OrderController {
         }
     }
 
-
     //Lấy ra chi tiết đơn hàng theo số serial
-//    @GetMapping("/order/history/{serialNumber}")
-//    public ResponseEntity<OrderResponse> getOrderHistoryBySerialNumber(@PathVariable("serialNumber") String serialNumber) {
-//        Order order = orderService.getOrderBySerialNumber(serialNumber);
-//        OrderResponse orderResponse = OrderConverterResponse.changeOrderResponse(order);
-//        return new ResponseEntity<>(orderResponse, HttpStatus.OK);
-//    }
-//
-//    //Lấy ra danh sách lịch sử mua hàng
-//    @GetMapping("/order/history")
-//    public ResponseEntity<List<OrderResponse>> getAllOrderHistory() {
-//        List<Order> orders = orderService.getAllOrders();
-//        List<OrderResponse> list = orders.stream().map(OrderConverterResponse::changeOrderResponse).collect(Collectors.toList());
-//        return new ResponseEntity<>(list, HttpStatus.OK);
-//    }
+    @GetMapping("/order/historySerial/{serialNumber}")
+    public ResponseEntity<OrderResponse> getOrderHistoryBySerialNumber(@PathVariable("serialNumber") String serialNumber) {
+        Order order = orderService.getOrderBySerialNumber(serialNumber);
+        OrderResponse orderResponse = OrderConverterResponse.changeOrderResponse(order);
+        return new ResponseEntity<>(orderResponse, HttpStatus.OK);
+    }
+
+    //Lấy ra danh sách lịch sử mua hàng
+    @GetMapping("/order/history")
+    public ResponseEntity<List<OrderResponse>> getAllOrderHistory() {
+        List<Order> orders = orderService.getAllUserOrders();
+        List<OrderResponse> list = orders.stream().map(OrderConverterResponse::changeOrderResponse).collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
 }

@@ -36,6 +36,6 @@ public class CustomDeniedHandler implements AccessDeniedHandler {
         Map<String , Object> map =new HashMap<>();
         map.put("error",new CustomException(exc.getMessage(),HttpStatus.FORBIDDEN));
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(response.getOutputStream(),map);
+        objectMapper.writeValue(response.getOutputStream(), "Không thể đăng nhập vào trang quản trị (403: FORBIDDEN)");
     }
 }

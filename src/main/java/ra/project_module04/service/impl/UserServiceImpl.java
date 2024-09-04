@@ -102,6 +102,11 @@ public class UserServiceImpl implements IUserService {
         if(!passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
             throw new NoSuchElementException("Mật khẩu cũ của bạn không đúng, mời bạn nhập lại !");
         }
+
+        if(oldPassword.equals(newPassword)) {
+            throw new NoSuchElementException("Mật khẩu mới đã trùng mật khẩu cũ, mời bạn nhập lại !");
+        }
+
         if (!newPassword.equals(confirmNewPassword)) {
             throw new NoSuchElementException("Nhập lại mật khẩu không chính xác !");
         }

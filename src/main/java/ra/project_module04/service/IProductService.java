@@ -13,7 +13,7 @@ public interface IProductService {
     Product getProductById(Long id);
     Product addProduct(ProductRequest product) throws CustomException;
     Product updateProduct(ProductRequest product, Long id) throws CustomException;
-    void deleteProduct(Long id);
+    void deleteProduct(Long id) throws CustomException;
     Page<Product> getProductWithPaginationAndSorting(Integer page, Integer pageSize, String sortBy, String orderBy, String searchName);
     List<Product> findProductByCategoryId(Long id);
     List<Product> getLatestProduct();

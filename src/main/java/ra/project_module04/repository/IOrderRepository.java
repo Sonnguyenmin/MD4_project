@@ -17,4 +17,6 @@ public interface IOrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatusAndUsers(OrderStatus orderStatus, Users users);
     Optional<Order> findBySerialNumberAndUsers(String serialNumber, Users users);
     Optional<Order> findByIdAndUsers(Long id, Users users);
+
+
 }
