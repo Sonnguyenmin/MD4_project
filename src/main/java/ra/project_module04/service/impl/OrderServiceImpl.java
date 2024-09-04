@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ra.project_module04.constants.OrderStatus;
 import ra.project_module04.model.dto.req.OrderRequest;
+import ra.project_module04.model.dto.resp.OrderDetailResponse;
+import ra.project_module04.model.dto.resp.OrderResponse;
 import ra.project_module04.model.entity.*;
 import ra.project_module04.repository.ICartRepository;
 import ra.project_module04.repository.IOrderDetailRepository;
@@ -96,8 +98,125 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<Order> getOrdersByStatus(OrderStatus status) {
-        return orderRepository.findByStatus(status);
+    public List<OrderResponse> getOrderResponsesByStatus(OrderStatus status) {
+        List<Order> orders = orderRepository.findByStatus(status);
+
+        if(orders.isEmpty()) {
+            throw new NoSuchElementException("Không có đơn hàng nào trong trạng thái: " + status);
+        }
+
+        return orders.stream().map(order -> OrderResponse.builder()
+                .id(order.getId())
+                .username(order.getUsers().getUsername())
+                .userId(order.getUsers().getId())
+                .serialNumber(order.getSerialNumber())
+                .totalPrice(order.getTotalPrice())
+                .receiveAddress(order.getReceiveAddress())
+                .receivePhone(order.getReceivePhone())
+                .receiveName(order.getReceiveName())
+                .note(order.getNote())
+                .status(order.getStatus())
+                .createdAt(order.getCreatedAt())
+                .receivedAt(order.getReceivedAt())
+                .orderDetail(order.getOrderDetails().stream().map(detail ->
+                                OrderDetailResponse.builder()
+                                        .productId(detail.getProduct().getId())
+                                        .name(detail.getName())
+                                        .unitPrice(detail.getUnitPrice())
+                                        .quantity(detail.getOrderQuantity())
+                                        .build())
+                        .collect(Collectors.toList()))
+                .build()).collect(Collectors.toList());
+    }
+
+    @Override
+    public OrderResponse getOrderById(Long id) {
+        Order order =  orderRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Không tồn tại đơn hàng"));
+
+        return OrderResponse.builder()
+                .id(order.getId())
+                .username(order.getUsers().getUsername())
+                .userId(order.getUsers().getId())
+                .serialNumber(order.getSerialNumber())
+                .totalPrice(order.getTotalPrice())
+                .receiveAddress(order.getReceiveAddress())
+                .receivePhone(order.getReceivePhone())
+                .receiveName(order.getReceiveName())
+                .note(order.getNote())
+                .status(order.getStatus())
+                .createdAt(order.getCreatedAt())
+                .receivedAt(order.getReceivedAt())
+                .orderDetail(
+                        order.getOrderDetails().stream().map(detail ->
+                                        OrderDetailResponse.builder()
+                                                .productId(detail.getProduct().getId())
+                                                .name(detail.getName())
+                                                .unitPrice(detail.getUnitPrice())
+                                                .quantity(detail.getOrderQuantity())
+                                                .build())
+                                .collect(Collectors.toList()))
+                .build();
+    }
+
+    @Override
+    public boolean updateOrderStatus(Long id, OrderStatus status) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Không tồn tại đơn hàng"));
+        order.setStatus(status);
+        orderRepository.save(order);
+        return true;
+    }
+
+
+    @Override
+    public List<Order> getAllUserOrders() {
+        Users user = userService.getCurrentLoggedInUser();
+        List<Order> orders = orderRepository.findAllByUsers(user);
+        if (orders.isEmpty()) {
+            throw new NoSuchElementException("Không có đơn hàng nào cho người dùng này.");
+        }
+        return orders;
+    }
+
+    @Override
+    public Order getOrderBySerialNumber(String serialNumber) {
+        Users user = userService.getCurrentLoggedInUser();
+        return orderRepository.findBySerialNumberAndUsers(serialNumber, user)
+                .orElseThrow(() ->new NoSuchElementException("Không tồn tại đơn hàng với mã này"));
+    }
+
+    @Override
+    public List<Order> getOrdersByStatus(OrderStatus orderStatus) {
+        Users user = userService.getCurrentLoggedInUser();
+
+        List<Order> orders = orderRepository.findByStatusAndUsers(orderStatus, user);
+
+        if (orders.isEmpty()) {
+            throw new NoSuchElementException("Không tìm thấy đơn hàng nào với trạng thái: " + orderStatus);
+        }
+        return orders;
+    }
+
+
+    @Override
+    public boolean cancelOrder(Long id) {
+        Users user = userService.getCurrentLoggedInUser();
+
+
+        Order order = orderRepository.findByIdAndUsers(id, user)
+                .orElseThrow(() -> new NoSuchElementException("Không tồn tại đơn hàng"));
+
+        if (order.getStatus() == OrderStatus.WAITING) {
+            for (OrderDetails orderDetail : order.getOrderDetails()) {
+                Product product = orderDetail.getProduct();
+                product.setStockQuantity(product.getStockQuantity() + orderDetail.getOrderQuantity());
+                productRepository.save(product);
+            }
+
+            order.setStatus(OrderStatus.CANCEL);
+            orderRepository.save(order);
+            return true;
+        }
+        return false;
     }
 }
 

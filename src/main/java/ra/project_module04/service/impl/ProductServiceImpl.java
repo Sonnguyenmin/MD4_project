@@ -55,9 +55,10 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Product addProduct(ProductRequest product) throws CustomException {
-        if (productRepository.existsByProductName(product.getProductName())) {
-            throw new CustomException("Tên sản phẩm đã tồn tại", HttpStatus.CONFLICT);
-        }
+//        if (productRepository.existsByProductName(product.getProductName())) {
+//            throw new CustomException("Tên sản phẩm đã tồn tại", HttpStatus.CONFLICT);
+//        }
+
         Product prod = Product.builder()
                 .productName(product.getProductName())
                 .description(product.getDescription())
@@ -76,9 +77,9 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public Product updateProduct(ProductRequest product, Long id) throws CustomException {
         productRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Không tồn tại sản phẩm có mã: " + id));
-        if(productRepository.existsByProductName(product.getProductName())) {
-            throw new CustomException("Tên sản phẩm đã tồn tại", HttpStatus.CONFLICT);
-        }
+//        if(productRepository.existsByProductName(product.getProductName())) {
+//            throw new CustomException("Tên sản phẩm đã tồn tại", HttpStatus.CONFLICT);
+//        }
 
         Product prod = Product.builder()
                 .productName(product.getProductName())

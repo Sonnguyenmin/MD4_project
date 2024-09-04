@@ -42,6 +42,10 @@ public class CartServiceImpl implements ICartService {
         Product product = productRepository.findById(addToCart.getProductId())
                 .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sản phẩm này"));
 
+        if(!product.getStatus()) {
+            throw new NoSuchElementException("Sản phẩm này không được bán hoặc đã hết hàng vui lòng chọn sản phẩm khác");
+        }
+
         if (addToCart.getQuantity() > product.getStockQuantity()) {
             throw new NoSuchElementException("Số lượng sản phẩm không đủ trong kho");
         }

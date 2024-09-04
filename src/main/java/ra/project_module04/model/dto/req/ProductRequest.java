@@ -39,15 +39,10 @@ public class ProductRequest {
 
     private Long categoryId;
 
-//    @NotNull(message = "Ngày tạo không được để trống")
-//    @JsonFormat(pattern = "dd/MM/yyyy")
-//    @Past(message = "Ngày tạo không hợp lệ")
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Date createdAt;
 
-//    @NotNull(message = "Ngày cập nhật không được để trống")
     @JsonFormat(pattern = "dd/MM/yyyy")
-//    @Past(message = "Ngày cập nhật không hợp lệ")
     private Date updatedAt;
 
     private Boolean status;

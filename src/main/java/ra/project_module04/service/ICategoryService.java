@@ -18,5 +18,4 @@ public interface ICategoryService {
     void deleteCategory(Long id) throws CustomException;
     Page<Category> getCategoryWithPaginationAndSorting(Integer page, Integer pageSize, String sortBy, String orderBy, String searchName);
     Page<Category> listCategoriesForSale(Pageable pageable);
-
 }

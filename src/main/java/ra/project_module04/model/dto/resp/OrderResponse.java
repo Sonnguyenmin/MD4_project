@@ -1,6 +1,7 @@
 package ra.project_module04.model.dto.resp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import ra.project_module04.constants.OrderStatus;

@@ -55,10 +55,13 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public Category updateCategory(CategoryRequest category, Long id) throws CustomException {
-        categoryRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Khong ton tai danh muc nao co ma: " + id));
-        if (categoryRepository.existsByCategoryName(category.getCategoryName())) {
+        Category existingCategory = categoryRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Khong ton tai danh muc nao co ma: " + id));
+
+        if (!existingCategory.getCategoryName().equals(category.getCategoryName())
+                && categoryRepository.existsByCategoryName(category.getCategoryName())) {
             throw new CustomException("Tên danh mục đã tồn tại", HttpStatus.CONFLICT);
         }
+
         Category cate = Category.builder()
                 .categoryName(category.getCategoryName())
                 .description(category.getDescription())

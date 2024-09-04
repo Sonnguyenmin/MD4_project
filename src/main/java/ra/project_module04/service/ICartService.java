@@ -11,7 +11,6 @@ public interface ICartService {
     List<CartResponse> getCart() ;
     void removeProductToCart(Long id);
     void removeAllProductToCart();
-
     ShoppingCart updateCartQuantity(Long id, Integer quantity);
 
 }
