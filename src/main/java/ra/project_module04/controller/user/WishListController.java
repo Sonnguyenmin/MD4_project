@@ -21,7 +21,7 @@ public class WishListController {
     private final IWishListService wishListService;
 
     @PostMapping("/wishList")
-    public ResponseEntity<WishListResponse> addWishList(@RequestBody WishListRequest wishListRequest) {
+    public ResponseEntity<WishListResponse> addWishList(@RequestBody WishListRequest wishListRequest) throws CustomException {
         WishListResponse wishListResponse = wishListService.addWishList(wishListRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(wishListResponse);
     }

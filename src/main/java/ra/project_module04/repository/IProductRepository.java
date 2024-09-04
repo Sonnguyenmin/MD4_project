@@ -28,6 +28,8 @@ public interface IProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsByCategory_Id(Long id);
 
+    boolean existsByProductNameAndCategory_Id(String productName, Long categoryId);
+
 //    @Query("select p from Product p order by p.createdAt asc")
 //    List<Product> getLatestProducts(Pageable pageable);
 //    List<Product> findTop5ByOrderByCreatedAtDesc();

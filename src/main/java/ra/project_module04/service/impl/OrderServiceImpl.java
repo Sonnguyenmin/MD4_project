@@ -1,8 +1,12 @@
 package ra.project_module04.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ra.project_module04.constants.OrderStatus;
+import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.OrderRequest;
 import ra.project_module04.model.dto.resp.OrderDetailResponse;
 import ra.project_module04.model.dto.resp.OrderResponse;
@@ -72,7 +76,6 @@ public class OrderServiceImpl implements IOrderService {
                 }).collect(Collectors.toList());
         List<OrderDetails> orderDetails = orderDetailRepository.saveAll(list);
         order.setOrderDetails(orderDetails);
-
         cartRepository.deleteAll(shoppingCartsItems);
         return order;
     }
@@ -216,6 +219,24 @@ public class OrderServiceImpl implements IOrderService {
             return true;
         }
         return false;
+    }
+
+
+    @Override
+    public List<Product> getTopSellingProducts(Integer limit) throws CustomException {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<Object[]> results = orderDetailRepository.findTopSellingProducts(pageable);
+
+        if (results.isEmpty()) {
+            throw new CustomException("Không có sản phẩm bán chạy nào", HttpStatus.BAD_REQUEST);
+        }
+
+        List<Product> topSellingProducts = new ArrayList<>();
+        for (Object[] result : results) {
+            Product product = (Product) result[0]; // Lấy sản phẩm từ kết quả
+            topSellingProducts.add(product);
+        }
+        return topSellingProducts;
     }
 }
 

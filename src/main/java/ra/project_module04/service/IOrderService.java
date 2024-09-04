@@ -5,6 +5,7 @@ import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.OrderRequest;
 import ra.project_module04.model.dto.resp.OrderResponse;
 import ra.project_module04.model.entity.Order;
+import ra.project_module04.model.entity.Product;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface IOrderService {
     List<Order> getOrdersByStatus(OrderStatus orderStatus);
 
     boolean cancelOrder(Long id);
+
+    List<Product> getTopSellingProducts(Integer limit) throws CustomException;
 }

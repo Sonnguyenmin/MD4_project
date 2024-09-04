@@ -1,6 +1,8 @@
 package ra.project_module04.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ra.project_module04.model.entity.Product;
 import ra.project_module04.model.entity.Users;
@@ -15,4 +17,8 @@ public interface IWishListRepository extends JpaRepository<WishList, Long> {
     Optional<WishList> findByIdAndUser(Long id, Users users);
     List<WishList> findByProduct(Product product);
 
+    @Query("select w.product from WishList w group by w.product order by count(w.product) desc ")
+    List<Product> findTopWishlistProducts(Pageable pageable);
+
+    boolean existsByUserAndProduct(Users users, Product product);
 }

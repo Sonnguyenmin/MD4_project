@@ -41,7 +41,6 @@ public class OrderAdminController {
     public ResponseEntity<?> updateOrderStatus( @PathVariable Long id, @RequestBody UDOrderStatusReq status) {
         try {
             boolean result = orderService.updateOrderStatus(id, status.getStatus());
-
             if (result) {
                 return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
             } else {

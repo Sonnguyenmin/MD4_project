@@ -5,8 +5,6 @@ import ra.project_module04.model.dto.req.FormLogin;
 import ra.project_module04.model.dto.req.FormRegister;
 import ra.project_module04.model.dto.resp.JwtResponse;
 
-import java.nio.file.AccessDeniedException;
-
 public interface IAuthService {
     boolean register(FormRegister formRegister) throws CustomException;
 

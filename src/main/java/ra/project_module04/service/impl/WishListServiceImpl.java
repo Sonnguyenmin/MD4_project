@@ -1,6 +1,8 @@
 package ra.project_module04.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ra.project_module04.advice.SuccessException;
@@ -31,10 +33,14 @@ public class WishListServiceImpl implements IWishListService {
     private final IWishListRepository wishListRepository;
 
     @Override
-    public WishListResponse addWishList(WishListRequest wishListRequest) {
+    public WishListResponse addWishList(WishListRequest wishListRequest) throws CustomException {
         Users user = userService.getCurrentLoggedInUser();
         Product product = productRepository.findById(wishListRequest.getProductId())
                 .orElseThrow(() -> new NoSuchElementException("Sản phẩm này không tồn tại"));
+
+        if (wishListRepository.existsByUserAndProduct(user, product)) {
+            throw new CustomException("Sản phẩm này đã có trong danh sách yêu thích của bạn", HttpStatus.BAD_REQUEST);
+        }
 
         WishList wishList = WishList.builder()
                 .user(user)
@@ -79,5 +85,17 @@ public class WishListServiceImpl implements IWishListService {
         } else {
             throw new CustomException("Không tồn tại sản phẩm yêu thích của bạn", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public List<Product> getTopWishlistProducts(Integer limit) throws CustomException {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<Product> topWishlistProducts = wishListRepository.findTopWishlistProducts(pageable);
+
+        if (topWishlistProducts.isEmpty()) {
+            throw new CustomException("Không có sản phẩm nổi bật nào ", HttpStatus.BAD_REQUEST);
+        }
+
+        return topWishlistProducts;
     }
 }

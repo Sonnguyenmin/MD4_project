@@ -8,10 +8,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.resp.DataResponse;
-import ra.project_module04.service.ICategoryService;
-import ra.project_module04.service.IProductService;
-import ra.project_module04.service.IUserService;
+import ra.project_module04.model.entity.OrderDetails;
+import ra.project_module04.model.entity.Product;
+import ra.project_module04.service.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api.example.com/v1")
@@ -22,6 +25,10 @@ public class UserController {
     private final ICategoryService categoryService;
 
     private final IProductService productService;
+
+    private final IOrderService orderService;
+
+    private final IWishListService wishListService;
 
 
     //Danh sách danh mục được bán
@@ -60,6 +67,20 @@ public class UserController {
     @GetMapping("/product/productSale")
     public ResponseEntity<DataResponse> getProductForSale(@PageableDefault(page = 0,size = 2, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return new ResponseEntity<>(new DataResponse(productService.listProductsForSale(pageable), HttpStatus.OK),HttpStatus.OK);
+    }
+
+    //Danh sách sản phẩm bán chạy
+    @GetMapping("/top-selling-products")
+    public ResponseEntity<List<Product>> getTopSellingProducts(@RequestParam(defaultValue = "5") Integer limit) throws CustomException {
+        List<Product> topSellingProducts = orderService.getTopSellingProducts(limit);
+        return new ResponseEntity<>(topSellingProducts, HttpStatus.OK);
+    }
+
+    //Danh sách sản phảm nổi bật
+    @GetMapping("/top-outstanding-products")
+    public ResponseEntity<List<Product>> getTopWishlistProducts(@RequestParam(defaultValue = "5") Integer limit) throws CustomException {
+        List<Product> topWishlistProducts = wishListService.getTopWishlistProducts(limit);
+        return new ResponseEntity<>(topWishlistProducts, HttpStatus.OK);
     }
 
 }

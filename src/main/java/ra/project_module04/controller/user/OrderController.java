@@ -23,9 +23,10 @@ public class OrderController {
 
     private final IOrderService orderService;
 
-    @PostMapping("/order")
+    @PostMapping("/cart/checkout")
     public ResponseEntity<DataResponse> orderNow(@Valid @RequestBody OrderRequest orderRequest) {
-        return new ResponseEntity<>(new DataResponse(orderService.orderNow(orderRequest), HttpStatus.OK), HttpStatus.OK);
+        orderService.orderNow(orderRequest);
+        return new ResponseEntity<>(new DataResponse("Bạn đã đặt hàng thành công", HttpStatus.OK), HttpStatus.OK);
     }
 
     //Lấy ra danh sách lịch sử mua hàng theo trạng thái đơn hàng

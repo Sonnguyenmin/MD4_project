@@ -1,10 +1,5 @@
 package ra.project_module04.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.ProductRequest;
 import ra.project_module04.model.entity.*;
@@ -23,7 +18,6 @@ import ra.project_module04.service.IProductService;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -60,10 +54,10 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Product addProduct(ProductRequest product) throws CustomException {
-//        if (productRepository.existsByProductName(product.getProductName())) {
-//            throw new CustomException("Tên sản phẩm đã tồn tại", HttpStatus.CONFLICT);
-//        }
-
+        if (productRepository.existsByProductNameAndCategory_Id(product.getProductName(), product.getCategoryId())) {
+            throw new CustomException("Sản phẩm đã tồn tại trong danh mục", HttpStatus.BAD_REQUEST);
+        }
+        
         Product prod = Product.builder()
                 .productName(product.getProductName())
                 .description(product.getDescription())
@@ -85,7 +79,6 @@ public class ProductServiceImpl implements IProductService {
 //        if(productRepository.existsByProductName(product.getProductName())) {
 //            throw new CustomException("Tên sản phẩm đã tồn tại", HttpStatus.CONFLICT);
 //        }
-
         Product prod = Product.builder()
                 .productName(product.getProductName())
                 .description(product.getDescription())
