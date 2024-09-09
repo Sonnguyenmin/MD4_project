@@ -13,4 +13,5 @@ public class WishListResponse {
     private String wishlistProName;
     private Long userId;
     private Long productId;
+
 }

@@ -4,6 +4,7 @@ import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.AddressRequest;
 import ra.project_module04.model.dto.resp.AddressResponse;
 import ra.project_module04.model.entity.Address;
+import ra.project_module04.model.entity.Users;
 
 import java.util.List;
 
@@ -12,4 +13,8 @@ public interface IAddressService {
     List<AddressResponse> getUserAddresses() throws CustomException;
     AddressResponse getAddressById(Long id);
     void deleteAddressById(Long id) throws CustomException;
+
+    Address getDefaultAddressForUser(Users user);
+
+    Address findByIdAndUser(Long id, Users user);
 }

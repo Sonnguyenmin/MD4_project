@@ -30,7 +30,7 @@ public class AddressServiceImpl implements IAddressService {
         Users user = userService.getCurrentLoggedInUser();
         if (address.getPhone() != null) {
             if (addressRepository.existsByPhone(address.getPhone())) {
-                throw new NoSuchElementException("Số điện thoại đã tồn tại");
+                throw new IllegalArgumentException("Số điện thoại đã tồn tại");
             }
         }
         Address newAddress = Address.builder()
@@ -38,6 +38,7 @@ public class AddressServiceImpl implements IAddressService {
                 .fullAddress(address.getFullAddress())
                 .phone(address.getPhone())
                 .receiveName(address.getReceiveName())
+                .isDefault(address.getIsDefault())
                 .build();
         return addressRepository.save(newAddress);
     }
@@ -48,7 +49,7 @@ public class AddressServiceImpl implements IAddressService {
 
         List<Address> addresses = addressRepository.findByUsers(user);
         if (addresses.isEmpty()) {
-            throw new CustomException("Không có địa chỉ nào của người dùng", HttpStatus.NOT_FOUND);
+            throw new SuccessException("Không có địa chỉ nào của người dùng");
         }
 
         List<AddressResponse> responseList = addresses.stream()
@@ -58,6 +59,7 @@ public class AddressServiceImpl implements IAddressService {
                     addressResponse.setFullAddress(addr.getFullAddress());
                     addressResponse.setPhone(addr.getPhone());
                     addressResponse.setReceiveName(addr.getReceiveName());
+                    addressResponse.setIsDefault(addr.getIsDefault());
                     return addressResponse;
                         }).collect(Collectors.toList());
         return responseList;
@@ -73,20 +75,31 @@ public class AddressServiceImpl implements IAddressService {
                 .fullAddress(address.getFullAddress())
                 .phone(address.getPhone())
                 .receiveName(address.getReceiveName())
+                .isDefault(address.getIsDefault())
                 .build();
     }
 
     @Override
     public void deleteAddressById(Long id) throws CustomException {
         Users user = userService.getCurrentLoggedInUser();
-        Address address = addressRepository.findByIdAndUsers(id, user).orElseThrow(()-> new CustomException("Không tồn tại địa chỉ này", HttpStatus.NOT_FOUND));
+        Address address = addressRepository.findByIdAndUsers(id, user).orElseThrow(()-> new NoSuchElementException("Không tồn tại địa chỉ này"));
         if(address.getUsers().getId().equals(user.getId())) {
             addressRepository.delete(address);
             throw new SuccessException("Đã xóa thành công địa chỉ");
         }
         else {
-            throw new CustomException("Không tồn tại địa chỉ của bạn", HttpStatus.NOT_FOUND);
+            throw new CustomException("Không tồn tại địa chỉ của bạn", HttpStatus.BAD_REQUEST);
         }
     }
 
+    @Override
+    public Address getDefaultAddressForUser(Users user) {
+        return addressRepository.findDefaultAddressByUser(user)
+                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy địa chỉ mặc định cho người dùng"));
+    }
+
+    @Override
+    public Address findByIdAndUser(Long id, Users user) {
+        return addressRepository.findByIdAndUsers(id, user).orElseThrow(()-> new NoSuchElementException("Không có địa chỉ của người dùng"));
+    }
 }

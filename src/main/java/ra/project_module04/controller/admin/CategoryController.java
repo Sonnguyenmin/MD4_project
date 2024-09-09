@@ -18,7 +18,7 @@ public class CategoryController {
     private final CategoryServiceImpl categoryService;
 
     @GetMapping
-    public ResponseEntity<DataResponse> getAllCategories() {
+    public ResponseEntity<DataResponse> getAllCategories( ) {
         return new ResponseEntity<>(new DataResponse(categoryService.getAllCategories(), HttpStatus.OK), HttpStatus.OK);
     }
 
@@ -40,7 +40,7 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<DataResponse> deleteCategory(@PathVariable("id") Long id) throws CustomException {
         categoryService.deleteCategory(id);
-        return new ResponseEntity<>(new DataResponse("Đã xóa thành công danh mục có mã: "+id, HttpStatus.NO_CONTENT), HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse("Đã xóa thành công danh mục có mã: "+id, HttpStatus.OK), HttpStatus.OK);
     }
 
 

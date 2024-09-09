@@ -1,6 +1,7 @@
 package ra.project_module04.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,12 @@ import ra.project_module04.service.IUserService;
 
 @RestController
 @RequestMapping("/api.example.com/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    private IAuthService authService;
 
-    @Autowired
-    private IUserService userService;
+    private final IAuthService authService;
+
+    private final IUserService userService;
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> doLogin(@Valid @RequestBody FormLogin formLogin) throws CustomException {

@@ -16,4 +16,6 @@ public class AddressRequest {
     private String phone;
     private String receiveName;
     private Long userId;
+
+    private Boolean isDefault = true;
 }

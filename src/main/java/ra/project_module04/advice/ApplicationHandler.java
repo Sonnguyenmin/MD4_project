@@ -24,7 +24,7 @@ public class ApplicationHandler {
         ex.getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
         return ResponseEntity.badRequest().body(
                 ResponseWrapper.builder()
-                        .eHttpStatus(EHttpStatus.FAILED)
+                        .eHttpStatus(EHttpStatus.BAD_REQUEST)
                         .statusCode(HttpStatus.BAD_REQUEST.value())
                         .data(errors)
                         .build()
@@ -56,19 +56,19 @@ public class ApplicationHandler {
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ResponseWrapper> handleNoSuchElementException(NoSuchElementException ex) {
+    public ResponseEntity<?> handleNoSuchElementException(NoSuchElementException ex) {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
-                        .eHttpStatus(EHttpStatus.FAILED) // Cần phải có định nghĩa cho EHttpStatus
-                        .statusCode(HttpStatus.NOT_FOUND.value()) // Hoặc ex.getHttpStatus().value() nếu có
+                        .eHttpStatus(EHttpStatus.NOT_FOUND)
+                        .statusCode(HttpStatus.NOT_FOUND.value())
                         .data(ex.getMessage())
                         .build(),
-                HttpStatus.NOT_FOUND // Hoặc ex.getHttpStatus() nếu có
+                HttpStatus.NOT_FOUND
         );
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ResponseWrapper> handleAccessDeniedException(AccessDeniedException ex) {
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex) {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.FORBIDDEN)
@@ -76,6 +76,19 @@ public class ApplicationHandler {
                         .data(ex.getMessage() != null ? ex.getMessage() : "Access denied")
                         .build(),
                 HttpStatus.FORBIDDEN
+        );
+    }
+
+    // Thêm phương thức xử lý cho trường hợp 400 BAD_REQUEST
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleBadRequestException(IllegalArgumentException ex) {
+        return new ResponseEntity<>(
+                ResponseWrapper.builder()
+                        .eHttpStatus(EHttpStatus.BAD_REQUEST)
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .data(ex.getMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST
         );
     }
 }

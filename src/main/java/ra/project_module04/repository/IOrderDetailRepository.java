@@ -13,9 +13,9 @@ import java.util.List;
 public interface IOrderDetailRepository extends JpaRepository<OrderDetails, Long> {
     List<OrderDetails> findByProduct(Product product);
 
-    @Query("select od.product, sum(od.orderQuantity) as totalQuantity " +
+    @Query("select od.product, sum(od.orderQuantity) AS purchaseCount " +
             "from OrderDetails od " +
             "group by od.product " +
-            "order by totalQuantity desc ")
+            "ORDER BY SUM(od.orderQuantity) DESC")
     List<Object[]> findTopSellingProducts(Pageable pageable);
 }

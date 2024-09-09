@@ -63,7 +63,7 @@ public class WishListServiceImpl implements IWishListService {
         Users user = userService.getCurrentLoggedInUser();
         List<WishList> wishList = wishListRepository.findAllByUser(user);
         if (wishList.isEmpty()) {
-            throw new CustomException("Không có sản phẩm nào trong danh sách yêu thích", HttpStatus.NOT_FOUND);
+            throw new CustomException("Không có sản phẩm nào trong danh sách yêu thích", HttpStatus.BAD_REQUEST);
         }
         List<WishListResponse> responseList = wishList.stream()
                 .map(wish -> { WishListResponse response = new WishListResponse();
@@ -78,12 +78,12 @@ public class WishListServiceImpl implements IWishListService {
     @Override
     public void deleteWishList(Long id) throws CustomException {
         Users user = userService.getCurrentLoggedInUser();
-        WishList wishList = wishListRepository.findByIdAndUser(id, user).orElseThrow(()-> new CustomException("không tồn tại mã sản phẩm yêu thích này", HttpStatus.NOT_FOUND));
+        WishList wishList = wishListRepository.findByIdAndUser(id, user).orElseThrow(()-> new CustomException("không tồn tại mã sản phẩm yêu thích này", HttpStatus.BAD_REQUEST));
         if (wishList.getUser().getId().equals(user.getId())) {
             wishListRepository.delete(wishList);
             throw new SuccessException("Đã xóa thành công sản phẩm yêu thích");
         } else {
-            throw new CustomException("Không tồn tại sản phẩm yêu thích của bạn", HttpStatus.NOT_FOUND);
+            throw new CustomException("Không tồn tại sản phẩm yêu thích của bạn", HttpStatus.BAD_REQUEST);
         }
     }
 

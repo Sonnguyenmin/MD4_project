@@ -21,20 +21,20 @@ public class WishListController {
     private final IWishListService wishListService;
 
     @PostMapping("/wishList")
-    public ResponseEntity<WishListResponse> addWishList(@RequestBody WishListRequest wishListRequest) throws CustomException {
+    public ResponseEntity<DataResponse> addWishList(@RequestBody WishListRequest wishListRequest) throws CustomException {
         WishListResponse wishListResponse = wishListService.addWishList(wishListRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(wishListResponse);
+        return new ResponseEntity<>(new DataResponse(wishListResponse, HttpStatus.CREATED), HttpStatus.CREATED);
     }
 
     @GetMapping("/wishList")
-    public ResponseEntity<List<WishListResponse>> getWishList() throws CustomException {
+    public ResponseEntity<DataResponse> getWishList() throws CustomException {
         List<WishListResponse> wishListResponses = wishListService.getAllWishList();
-        return ResponseEntity.status(HttpStatus.OK).body(wishListResponses);
+        return new ResponseEntity<>(new DataResponse(wishListResponses, HttpStatus.OK), HttpStatus.OK);
     }
 
     @DeleteMapping("/wishList/{id}")
     public ResponseEntity<DataResponse> deleteWishList(@PathVariable Long id) throws CustomException {
          wishListService.deleteWishList(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return new ResponseEntity<>(new DataResponse("Xóa thành công sản phẩm yêu thích", HttpStatus.OK), HttpStatus.OK);
     }
 }

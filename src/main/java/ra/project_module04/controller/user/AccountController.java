@@ -2,14 +2,11 @@ package ra.project_module04.controller.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ra.project_module04.model.dto.req.UserRequest;
 import ra.project_module04.model.dto.resp.DataResponse;
-import ra.project_module04.model.dto.resp.UserResponse;
-import ra.project_module04.model.entity.Users;
 import ra.project_module04.service.IUserService;
 
 @RestController
@@ -19,18 +16,19 @@ public class AccountController {
     private final IUserService userService;
 
     @PutMapping("/account/change_password")
-    public ResponseEntity<String> changePassword(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<DataResponse> changePassword(@RequestBody UserRequest userRequest) {
         boolean result = userService.changePassword(userRequest.getOldPassword(), userRequest.getNewPassword(), userRequest.getConfirmNewPassword());
         if (result) {
-            return ResponseEntity.ok("Đổi mật khẩu thành công !!");
+            return new ResponseEntity<>(new DataResponse("Đổi mật khẩu thành công !!", HttpStatus.OK), HttpStatus.OK);
         } else {
-            return ResponseEntity.badRequest().body("Thay đổi mật khẩu thất bại");
+            return new ResponseEntity<>(new DataResponse("Thay đổi mật khẩu thất bại",HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/account/updateProfile")
     public ResponseEntity<DataResponse> updateProfile(@Valid @ModelAttribute UserRequest userRequest) {
-       return new ResponseEntity<>(new DataResponse(userService.updateUser(userRequest), HttpStatus.OK), HttpStatus.OK);
+        userService.updateUser(userRequest);
+        return new ResponseEntity<>(new DataResponse("Đã cập nhật thành công thông tin người dùng", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/account")

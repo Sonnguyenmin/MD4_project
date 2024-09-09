@@ -1,8 +1,6 @@
 package ra.project_module04.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Service;
 import ra.project_module04.constants.RoleName;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.UserRequest;
+import ra.project_module04.model.entity.Product;
 import ra.project_module04.model.entity.Users;
 import ra.project_module04.repository.IUserRepository;
 import ra.project_module04.service.IUserService;
@@ -43,8 +42,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public List<Users> getAllUsers() {
-        return userRepository.findAll();
+    public Page<Users> getAllUsers(Pageable pageable, String search) {
+        Page<Users> user;
+        if(search == null || search.isEmpty()) {
+            user = userRepository.findAll(pageable);
+        } else {
+            user = userRepository.findUsersByFullNameContainsIgnoreCase(search, pageable);
+        }
+        return user;
     }
 
     @Override
@@ -70,7 +75,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         // Tìm người dùng
-        Page<Users> usersPage = userRepository.findUsersByUsernameContains(searchName, pageable);
+        Page<Users> usersPage = userRepository.findUsersByFullNameContainsIgnoreCase(searchName, pageable);
 
         // Kiểm tra nếu không có người dùng
         if (usersPage.isEmpty()) {
@@ -89,7 +94,7 @@ public class UserServiceImpl implements IUserService {
         boolean isAdmin = users.getRoles().stream().anyMatch(roles -> roles.getRoleName().equals(RoleName.ROLE_ADMIN));
 
         if (isAdmin) {
-            throw new CustomException("Không thể thay đổi trạng thái của người dùng Admin có id: " + id, HttpStatus.FORBIDDEN);
+            throw new IllegalArgumentException("Không thể thay đổi trạng thái của người dùng Admin ");
         }
         users.setStatus(status);
         return userRepository.save(users);
@@ -105,6 +110,18 @@ public class UserServiceImpl implements IUserService {
 
         if(oldPassword.equals(newPassword)) {
             throw new NoSuchElementException("Mật khẩu mới đã trùng mật khẩu cũ, mời bạn nhập lại !");
+        }
+
+        if (newPassword.trim().isEmpty()) {
+            throw new NoSuchElementException("Mật khẩu mới không được để trống !");
+        }
+
+        if (newPassword.length() < 4) {
+            throw new NoSuchElementException("Mật khẩu mới phải có ít nhất 4 ký tự !");
+        }
+
+        if (confirmNewPassword.trim().isEmpty()) {
+            throw new NoSuchElementException("Nhập lại mật khẩu không được để trống !");
         }
 
         if (!newPassword.equals(confirmNewPassword)) {
@@ -133,15 +150,15 @@ public class UserServiceImpl implements IUserService {
         }
 
         if (userRequest.getEmail() != null) {
-            if (userRepository.existsByEmail(userRequest.getEmail())) {
-                throw new NoSuchElementException("email đã tồn tại");
+            if (!updateUser.getEmail().equals(userRequest.getEmail()) && userRepository.existsByEmail(userRequest.getEmail())) {
+                throw new NoSuchElementException("Email đã tồn tại.");
             }
             updateUser.setEmail(userRequest.getEmail());
         }
 
         if (userRequest.getPhone() != null) {
-            if (userRepository.existsByPhone(userRequest.getPhone())) {
-                throw new NoSuchElementException("Số điện thoại đã tồn tại");
+            if (!updateUser.getPhone().equals(userRequest.getPhone()) && userRepository.existsByPhone(userRequest.getPhone())) {
+                throw new NoSuchElementException("Số điện thoại đã tồn tại.");
             }
             updateUser.setPhone(userRequest.getPhone());
         }

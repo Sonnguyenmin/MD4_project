@@ -14,10 +14,12 @@ public interface IProductService {
     Product addProduct(ProductRequest product) throws CustomException;
     Product updateProduct(ProductRequest product, Long id) throws CustomException;
     void deleteProduct(Long id) throws CustomException;
-    Page<Product> getProductWithPaginationAndSorting(Integer page, Integer pageSize, String sortBy, String orderBy, String searchName);
+    Page<Product> getProductWithPaginationAndSorting(Integer page, Integer pageSize, String sortBy, String orderBy, String searchName) throws CustomException;
     List<Product> findProductByCategoryId(Long id);
     List<Product> getLatestProduct();
     List<Product> findProductByProductNameOrDescription(String search);
 
     Page<Product> listProductsForSale(Pageable pageable);
+
+    List<Product> getProductsSortedByPrice();
 }

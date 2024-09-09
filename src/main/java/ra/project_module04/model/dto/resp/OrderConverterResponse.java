@@ -13,8 +13,7 @@ public class OrderConverterResponse {
                         .name(orderDetails.getProduct().getProductName())
                         .quantity(orderDetails.getOrderQuantity())
                         .unitPrice(orderDetails.getUnitPrice())
-                        .build())
-                .collect(Collectors.toList());
+                        .build()).collect(Collectors.toList());
         return OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUsers().getId())

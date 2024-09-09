@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.ProductRequest;
 import ra.project_module04.model.dto.resp.DataResponse;
+import ra.project_module04.model.entity.Product;
 import ra.project_module04.service.impl.ProductServiceImpl;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api.example.com/v1/admin/products")
@@ -20,7 +23,7 @@ public class ProductController {
     private final ProductServiceImpl productService;
 
     @GetMapping
-    public ResponseEntity<DataResponse> getAllProducts(@PageableDefault(page = 0,size = 2, sort = "id",direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(defaultValue = "" ) String search) {
+    public ResponseEntity<DataResponse> getAllProducts(@PageableDefault(page = 0,size = 5, sort = "id",direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(defaultValue = "" ) String search) {
         return new ResponseEntity<>(new DataResponse(productService.getAllProduct(pageable,search),HttpStatus.OK),HttpStatus.OK);
     }
 
@@ -42,17 +45,22 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<DataResponse> deleteProduct(@PathVariable("id") Long id) throws CustomException {
         productService.deleteProduct(id);
-        return new ResponseEntity<>(new DataResponse("Đã xóa thành công sản phẩm có mã: "+id, HttpStatus.NO_CONTENT), HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse("Đã xóa thành công sản phẩm có mã: "+id, HttpStatus.OK), HttpStatus.OK);
     }
-
 
     @GetMapping("/searchByProductName")
     public ResponseEntity<DataResponse> searchByCategoryName(@RequestParam(name = "searchName", defaultValue = "")String searchName,
                                                              @RequestParam(name = "page", defaultValue = "0")Integer page,
                                                              @RequestParam(name = "pageSize", defaultValue = "2")Integer pageSize,
                                                              @RequestParam(name = "sortBy", defaultValue = "")String sortBy,
-                                                             @RequestParam(name = "orderBy", defaultValue = "asc")String orderBy) {
+                                                             @RequestParam(name = "orderBy", defaultValue = "asc")String orderBy) throws CustomException {
 
         return new ResponseEntity<>(new DataResponse(productService.getProductWithPaginationAndSorting(page, pageSize, sortBy, orderBy, searchName).getContent(), HttpStatus.OK), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/sortedByPrice")
+    public List<Product> getProductsSortedByPrice() {
+        return productService.getProductsSortedByPrice();
     }
 }

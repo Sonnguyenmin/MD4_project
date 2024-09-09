@@ -4,6 +4,7 @@ import ra.project_module04.constants.OrderStatus;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.OrderRequest;
 import ra.project_module04.model.dto.resp.OrderResponse;
+import ra.project_module04.model.dto.resp.TopSellingProductResponse;
 import ra.project_module04.model.entity.Order;
 import ra.project_module04.model.entity.Product;
 
@@ -14,13 +15,13 @@ public interface IOrderService {
     List<Order> getAllOrders();
     List<OrderResponse> getOrderResponsesByStatus(OrderStatus status) throws CustomException;
     OrderResponse getOrderById(Long id);
-    boolean updateOrderStatus(Long id, OrderStatus status);
+    boolean updateOrderStatus(Long id, OrderStatus status) throws CustomException;
     List<Order> getAllUserOrders();
     Order getOrderBySerialNumber(String serialNumber);
 
     List<Order> getOrdersByStatus(OrderStatus orderStatus);
 
-    boolean cancelOrder(Long id);
+    boolean cancelOrder(Long id) throws CustomException;
 
-    List<Product> getTopSellingProducts(Integer limit) throws CustomException;
+    List<TopSellingProductResponse> getTopSellingProducts(Integer limit) throws CustomException;
 }

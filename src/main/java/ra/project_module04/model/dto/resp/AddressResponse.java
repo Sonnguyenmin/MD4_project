@@ -13,4 +13,5 @@ public class AddressResponse {
     private String fullAddress;
     private String phone;
     private String receiveName;
+    private Boolean isDefault = true;
 }

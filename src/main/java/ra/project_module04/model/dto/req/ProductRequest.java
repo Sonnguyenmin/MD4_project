@@ -31,7 +31,6 @@ public class ProductRequest {
     private Double unitPrice;
 
     @NotNull(message = "Số lượng không được để trống")
-    @Min(0)
     private Integer stockQuantity;
 
     @NotNull(message = "Ảnh không được để trống")
@@ -39,11 +38,12 @@ public class ProductRequest {
 
     private Long categoryId;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
+//    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date createdAt;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
+//    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date updatedAt;
 
     private Boolean status;
+
 }

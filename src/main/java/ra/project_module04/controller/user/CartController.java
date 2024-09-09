@@ -1,6 +1,5 @@
 package ra.project_module04.controller.user;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +14,11 @@ import ra.project_module04.service.IUserService;
 @RequestMapping("/api.example.com/v1/user")
 @RequiredArgsConstructor
 public class CartController {
-    private final IUserService userService;
-
     private final ICartService cartService;
 
     @PostMapping("/cart/add")
     public ResponseEntity<DataResponse> addToCart(@RequestBody AddToCartRequest addToCart){
-        return new ResponseEntity<>(new DataResponse(cartService.addToCart(addToCart), HttpStatus.OK), HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse(cartService.addToCart(addToCart), HttpStatus.CREATED), HttpStatus.CREATED);
     }
 
     @GetMapping("cart/list")

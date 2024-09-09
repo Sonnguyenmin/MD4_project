@@ -10,5 +10,5 @@ import ra.project_module04.constants.OrderStatus;
 @Builder
 
 public class UpdateOrderStatusReq {
-    private OrderStatus orderStatus;
+    private OrderStatus status;
 }

@@ -21,24 +21,25 @@ public class AddressController {
 
     @PostMapping("/addAddress")
     public ResponseEntity<DataResponse> addAddress(@Valid @RequestBody AddressRequest address) {
-        return new ResponseEntity<>(new DataResponse(addressService.addNewAddress(address), HttpStatus.OK), HttpStatus.OK);
+        addressService.addNewAddress(address);
+        return new ResponseEntity<>(new DataResponse("Thêm địa chỉ người dùng thành công", HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/address")
-    public ResponseEntity<List<AddressResponse>> getAllAddresses() throws CustomException {
+    public ResponseEntity<DataResponse> getAllAddresses() throws CustomException {
             List<AddressResponse> addressResponse = addressService.getUserAddresses();
-            return ResponseEntity.status(HttpStatus.OK).body(addressResponse);
+            return new ResponseEntity<>(new DataResponse(addressResponse, HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/address/{id}")
-    public ResponseEntity<AddressResponse> getAddressById(@PathVariable Long id) throws CustomException {
+    public ResponseEntity<DataResponse> getAddressById(@PathVariable Long id) {
         AddressResponse addressResponse = addressService.getAddressById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(addressResponse);
+        return new ResponseEntity<>(new DataResponse(addressResponse, HttpStatus.OK), HttpStatus.OK);
     }
 
     @DeleteMapping("/address/{id}")
     public ResponseEntity<DataResponse> deleteAddress(@PathVariable Long id) throws CustomException {
         addressService.deleteAddressById(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return new ResponseEntity<>(new DataResponse("Đã xóa thành công địa chỉ", HttpStatus.OK), HttpStatus.OK);
     }
 }

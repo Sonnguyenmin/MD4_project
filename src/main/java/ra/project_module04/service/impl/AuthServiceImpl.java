@@ -48,15 +48,15 @@ public class AuthServiceImpl implements IAuthService {
     public boolean register(FormRegister formRegister) throws CustomException {
 
         if (userRepository.existsByUsername(formRegister.getUsername())){
-            throw new CustomException("Tên đăng nhập đã tồn tại",HttpStatus.CONFLICT);
+            throw new IllegalArgumentException("Tên đăng nhập đã tồn tại");
         }
 
         if(userRepository.existsByPhone(formRegister.getPhone())) {
-            throw new CustomException("Số điện thoại đã tồn tại", HttpStatus.CONFLICT);
+            throw new IllegalArgumentException("Số điện thoại đã tồn tại");
         }
 
         if (userRepository.existsByEmail(formRegister.getEmail())) {
-            throw new CustomException("Email đã tồn tại", HttpStatus.CONFLICT);
+            throw new IllegalArgumentException("Email đã tồn tại");
         }
 
         Users user = Users.builder()

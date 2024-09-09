@@ -32,22 +32,22 @@ public class CartServiceImpl implements ICartService {
     public ShoppingCart addToCart(AddToCartRequest addToCart) {
 
         if (addToCart.getProductId() == null) {
-            throw new NoSuchElementException("Mã sản phẩm không được phép rỗng");
+            throw new IllegalArgumentException("Mã sản phẩm không được phép rỗng");
         }
         if (addToCart.getQuantity() == null || addToCart.getQuantity() <= 0) {
-            throw new NoSuchElementException("Số lượng không để trống và số lượng phải lớn hơn 0");
+            throw new IllegalArgumentException("Số lượng không để trống và số lượng phải lớn hơn 0");
         }
 
         Users user = userService.getCurrentLoggedInUser();
         Product product = productRepository.findById(addToCart.getProductId())
-                .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sản phẩm này"));
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm này"));
 
         if(!product.getStatus()) {
-            throw new NoSuchElementException("Sản phẩm này không được bán hoặc đã hết hàng vui lòng chọn sản phẩm khác");
+            throw new IllegalArgumentException("Sản phẩm này không được bán hoặc đã hết hàng vui lòng chọn sản phẩm khác");
         }
 
         if (addToCart.getQuantity() > product.getStockQuantity()) {
-            throw new NoSuchElementException("Số lượng sản phẩm không đủ trong kho");
+            throw new IllegalArgumentException("Số lượng sản phẩm không đủ trong kho");
         }
 
         ShoppingCart shoppingCart = cartRepository.findByUsersAndProduct(user, product)
@@ -86,6 +86,9 @@ public class CartServiceImpl implements ICartService {
         Users user = userService.getCurrentLoggedInUser();
         ShoppingCart shoppingCart = cartRepository.findByIdAndUsers(id, user)
                 .orElseThrow(() -> new NoSuchElementException("Không có sản phẩm trong giỏ hàng"));
+        if (!shoppingCart.getUsers().equals(user)) {
+            throw new IllegalArgumentException("Không tìm thấy người dùng này.");
+        }
         cartRepository.delete(shoppingCart);
     }
 

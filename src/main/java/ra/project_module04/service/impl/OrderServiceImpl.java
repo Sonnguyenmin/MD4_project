@@ -1,20 +1,21 @@
 package ra.project_module04.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import ra.project_module04.advice.SuccessException;
 import ra.project_module04.constants.OrderStatus;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.OrderRequest;
 import ra.project_module04.model.dto.resp.OrderDetailResponse;
 import ra.project_module04.model.dto.resp.OrderResponse;
+import ra.project_module04.model.dto.resp.TopSellingProductResponse;
 import ra.project_module04.model.entity.*;
-import ra.project_module04.repository.ICartRepository;
-import ra.project_module04.repository.IOrderDetailRepository;
-import ra.project_module04.repository.IOrderRepository;
-import ra.project_module04.repository.IProductRepository;
+import ra.project_module04.repository.*;
+import ra.project_module04.service.IAddressService;
 import ra.project_module04.service.IOrderService;
 import ra.project_module04.service.IUserService;
 
@@ -34,6 +35,12 @@ public class OrderServiceImpl implements IOrderService {
 
     private final IOrderDetailRepository orderDetailRepository;
 
+    private final IAddressService addressService;
+
+    private final IAddressRepository addressRepository;
+
+
+
     @Override
     public Order orderNow(OrderRequest orderRequest) {
         Users user = userService.getCurrentLoggedInUser();
@@ -43,14 +50,25 @@ public class OrderServiceImpl implements IOrderService {
             throw new NoSuchElementException("Giỏ hàng trống, không có sản phẩm nào để đặt hàng");
         }
 
+        // Tìm địa chỉ theo ID
+//        Address address = addressService.findByIdAndUser(id, user);
+//        if (address == null) {
+//            throw new NoSuchElementException("Không tìm thấy địa chỉ cho người dùng. Vui lòng thêm địa chỉ trước khi đặt hàng.");
+//        }
+
+        Address address = addressService.getDefaultAddressForUser(user);
+
+        if (address == null) {
+            throw new NoSuchElementException("Không tìm thấy địa chỉ cho người dùng. Vui lòng thêm địa chỉ trước khi đặt hàng.");
+        }
         Order order = Order.builder()
                 .users(user)
                 .serialNumber(UUID.randomUUID().toString())
                 .totalPrice(calculateTotalPrice(shoppingCartsItems))
                 .status(OrderStatus.WAITING)
-                .receiveAddress(orderRequest.getReceiveAddress())
-                .receivePhone(orderRequest.getReceivePhone())
-                .receiveName(orderRequest.getReceiveName())
+                .receiveAddress(address.getFullAddress())
+                .receivePhone(address.getPhone())
+                .receiveName(address.getReceiveName())
                 .note(orderRequest.getNote())
                 .createdAt(new Date())
                 .receivedAt(addDays(new Date(), 4))
@@ -97,7 +115,12 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        List<Order> orders = orderRepository.findAll();
+        if(orders.isEmpty()) {
+            throw new SuccessException("Không có sản phẩm nào trong đơn hàng");
+        }
+
+        return orders;
     }
 
     @Override
@@ -162,11 +185,29 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public boolean updateOrderStatus(Long id, OrderStatus status) {
+    public boolean updateOrderStatus(Long id, OrderStatus status) throws CustomException {
         Order order = orderRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Không tồn tại đơn hàng"));
+
+        OrderStatus currentStatus = order.getStatus();
+
+        if(order.getStatus() == OrderStatus.CANCEL) {
+            throw new CustomException("Không thể thay đổi trạng thái đơn hàng vì người dùng đã hủy đơn hàng", HttpStatus.BAD_REQUEST);
+        }
+
+        if(order.getStatus() == OrderStatus.SUCCESS) {
+            throw new CustomException("Đơn hàng đã giao thành công nên khôn thể thay đổi trạng thái", HttpStatus.BAD_REQUEST);
+        }
+
+        if(!canChaneStatus(currentStatus, status)){
+            throw new CustomException("Không thể thay dổi trang thái của đơn hàng trước đó", HttpStatus.BAD_REQUEST);
+        }
         order.setStatus(status);
         orderRepository.save(order);
         return true;
+    }
+
+    private boolean canChaneStatus(OrderStatus currentStatus, OrderStatus newStatus) {
+        return currentStatus.ordinal() < newStatus.ordinal();
     }
 
 
@@ -175,7 +216,7 @@ public class OrderServiceImpl implements IOrderService {
         Users user = userService.getCurrentLoggedInUser();
         List<Order> orders = orderRepository.findAllByUsers(user);
         if (orders.isEmpty()) {
-            throw new NoSuchElementException("Không có đơn hàng nào cho người dùng này.");
+            throw new IllegalArgumentException("Không có đơn hàng nào cho người dùng này.");
         }
         return orders;
     }
@@ -190,9 +231,7 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public List<Order> getOrdersByStatus(OrderStatus orderStatus) {
         Users user = userService.getCurrentLoggedInUser();
-
         List<Order> orders = orderRepository.findByStatusAndUsers(orderStatus, user);
-
         if (orders.isEmpty()) {
             throw new NoSuchElementException("Không tìm thấy đơn hàng nào với trạng thái: " + orderStatus);
         }
@@ -202,28 +241,35 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public boolean cancelOrder(Long id) {
+        // Lấy người dùng hiện tại
         Users user = userService.getCurrentLoggedInUser();
 
+        // Tìm đơn hàng theo ID và người dùng
         Order order = orderRepository.findByIdAndUsers(id, user)
-                .orElseThrow(() -> new NoSuchElementException("Không tồn tại đơn hàng"));
+                .orElseThrow(() -> new NoSuchElementException("Không tồn tại đơn hàng hoặc bạn không có quyền truy cập"));
 
+        // Kiểm tra trạng thái đơn hàng
         if (order.getStatus() == OrderStatus.WAITING) {
+            // Cập nhật số lượng sản phẩm trong kho
             for (OrderDetails orderDetail : order.getOrderDetails()) {
                 Product product = orderDetail.getProduct();
                 product.setStockQuantity(product.getStockQuantity() + orderDetail.getOrderQuantity());
                 productRepository.save(product);
             }
 
+            // Thay đổi trạng thái đơn hàng thành CANCEL
             order.setStatus(OrderStatus.CANCEL);
             orderRepository.save(order);
             return true;
+        } else if (order.getStatus() == OrderStatus.CONFIRM) {
+            throw new IllegalArgumentException("Sản phẩm đã được xác nhận, bạn không thể hủy đơn hàng");
         }
-        return false;
+
+        return false; // Trả về false nếu không có điều kiện nào được thỏa mãn
     }
 
-
     @Override
-    public List<Product> getTopSellingProducts(Integer limit) throws CustomException {
+    public List<TopSellingProductResponse> getTopSellingProducts(Integer limit) throws CustomException {
         Pageable pageable = PageRequest.of(0, limit);
         List<Object[]> results = orderDetailRepository.findTopSellingProducts(pageable);
 
@@ -231,12 +277,20 @@ public class OrderServiceImpl implements IOrderService {
             throw new CustomException("Không có sản phẩm bán chạy nào", HttpStatus.BAD_REQUEST);
         }
 
-        List<Product> topSellingProducts = new ArrayList<>();
+        List<TopSellingProductResponse> topSellingProducts = new ArrayList<>();
         for (Object[] result : results) {
-            Product product = (Product) result[0]; // Lấy sản phẩm từ kết quả
-            topSellingProducts.add(product);
+            Product product = (Product) result[0];
+            Long purchaseCount = (Long) result[1];
+
+            TopSellingProductResponse response = new TopSellingProductResponse();
+            response.setProduct(product);
+            response.setPurchaseCount(purchaseCount);
+
+            topSellingProducts.add(response);
         }
         return topSellingProducts;
     }
+
+
 }
 

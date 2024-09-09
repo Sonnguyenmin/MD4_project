@@ -8,6 +8,7 @@ import ra.project_module04.repository.IRoleRepository;
 import ra.project_module04.service.IRoleService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -17,10 +18,11 @@ public class RoleServiceImpl implements IRoleService {
     @Override
     public List<Roles> getAllRoles() {
         return roleRepository.findAll();
+
     }
 
     @Override
     public Roles findByRoleName(RoleName roleName) {
-        return roleRepository.findByRoleName(roleName).orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò"));
+        return roleRepository.findByRoleName(roleName).orElseThrow(() -> new NoSuchElementException("Không tìm thấy vai trò"));
     }
 }

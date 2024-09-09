@@ -1,6 +1,9 @@
 package ra.project_module04.controller.admin;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +26,14 @@ public class AdminController {
     private final IRoleService roleService;
 
     @GetMapping
-    public ResponseEntity<?> admin() {
-        return ResponseEntity.ok().body("Chào mừng đến với trang quản trị");
+    public ResponseEntity<DataResponse> admin() {
+        return new ResponseEntity<>(new DataResponse("Chào mừng đến với trang quản trị", HttpStatus.OK), HttpStatus.OK);
     }
 
+
     @GetMapping("/userAdmin")
-    public ResponseEntity<DataResponse> getAllUserAdmin() {
-        return new ResponseEntity<>(new DataResponse(userService.getAllUsers(), HttpStatus.OK), HttpStatus.OK);
+    public ResponseEntity<DataResponse> getAllUserAdmin(@PageableDefault(page = 0,size = 5, sort = "id",direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(defaultValue = "" ) String search) {
+        return new ResponseEntity<>(new DataResponse(userService.getAllUsers(pageable, search), HttpStatus.OK), HttpStatus.OK);
     }
 
 
@@ -43,14 +47,13 @@ public class AdminController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Users> changeUserStatus(@PathVariable Long id, @RequestParam Boolean status) throws CustomException {
+    public ResponseEntity<DataResponse> changeUserStatus(@PathVariable Long id, @RequestParam Boolean status) throws CustomException {
         Users changeUserStatus = userService.updateUserStatus(id, status);
-        return new ResponseEntity<>(changeUserStatus, HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse(changeUserStatus, HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/roles")
-    public ResponseEntity<List<Roles>> getAll(){
-        return new ResponseEntity<>(roleService.getAllRoles(), HttpStatus.OK);
+    public ResponseEntity<DataResponse> getAll(){
+        return new ResponseEntity<>(new DataResponse(roleService.getAllRoles(), HttpStatus.OK), HttpStatus.OK);
     }
-
 }

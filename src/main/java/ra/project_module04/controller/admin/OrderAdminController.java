@@ -5,13 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ra.project_module04.constants.OrderStatus;
-import ra.project_module04.model.dto.req.UDOrderStatusReq;
+import ra.project_module04.exception.CustomException;
+import ra.project_module04.model.dto.req.UpdateOrderStatusReq;
+import ra.project_module04.model.dto.resp.DataResponse;
 import ra.project_module04.model.dto.resp.OrderResponse;
 import ra.project_module04.model.entity.Order;
 import ra.project_module04.service.impl.OrderServiceImpl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api.example.com/v1/admin/order")
@@ -20,37 +21,31 @@ public class OrderAdminController {
     private final OrderServiceImpl orderService;
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
+    public ResponseEntity<DataResponse> getAllOrders() {
         List<Order> orders = orderService.getAllOrders();
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse(orders, HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("/orderById/{id}")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<DataResponse> getOrderById(@PathVariable Long id) {
         OrderResponse orderResponse = orderService.getOrderById(id);
-        return ResponseEntity.ok(orderResponse);
+        return new ResponseEntity<>(new DataResponse(orderResponse, HttpStatus.OK), HttpStatus.OK);
     }
 
     @GetMapping("orderStatus/{status}")
-    public ResponseEntity<List<OrderResponse>> getOrderByStatus(@PathVariable OrderStatus status){
+    public ResponseEntity<DataResponse> getOrderByStatus(@PathVariable OrderStatus status){
         List<OrderResponse> orderResponses = orderService.getOrderResponsesByStatus(status);
-        return ResponseEntity.ok(orderResponses);
+        return new ResponseEntity<>(new DataResponse(orderResponses, HttpStatus.OK), HttpStatus.OK);
     }
 
     @PutMapping("/status/{id}")
-    public ResponseEntity<?> updateOrderStatus( @PathVariable Long id, @RequestBody UDOrderStatusReq status) {
-        try {
+    public ResponseEntity<DataResponse> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateOrderStatusReq status) throws CustomException {
             boolean result = orderService.updateOrderStatus(id, status.getStatus());
             if (result) {
-                return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
+                return new ResponseEntity<>(new DataResponse("Cập nhật trạng thái đơn hàng thành công!", HttpStatus.OK), HttpStatus.OK);
             } else {
-                return ResponseEntity.badRequest().body("Cập nhật trạng thái đơn hàng thất bại.");
+                return new ResponseEntity<>(new DataResponse("Cập nhật trạng thái đơn hàng thất bại.", HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
             }
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra trong quá trình cập nhật trạng thái.");
-        }
     }
 
 }

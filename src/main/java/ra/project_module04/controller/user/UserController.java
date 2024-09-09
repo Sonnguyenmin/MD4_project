@@ -1,7 +1,6 @@
 package ra.project_module04.controller.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -10,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.resp.DataResponse;
-import ra.project_module04.model.entity.OrderDetails;
+import ra.project_module04.model.dto.resp.TopSellingProductResponse;
 import ra.project_module04.model.entity.Product;
 import ra.project_module04.service.*;
 
@@ -71,16 +70,15 @@ public class UserController {
 
     //Danh sách sản phẩm bán chạy
     @GetMapping("/top-selling-products")
-    public ResponseEntity<List<Product>> getTopSellingProducts(@RequestParam(defaultValue = "5") Integer limit) throws CustomException {
-        List<Product> topSellingProducts = orderService.getTopSellingProducts(limit);
-        return new ResponseEntity<>(topSellingProducts, HttpStatus.OK);
+    public ResponseEntity<DataResponse> getTopSellingProducts(@RequestParam(defaultValue = "5") Integer limit) throws CustomException {
+        List<TopSellingProductResponse> topSellingProducts = orderService.getTopSellingProducts(limit);
+        return new ResponseEntity<>(new DataResponse(topSellingProducts, HttpStatus.OK), HttpStatus.OK);
     }
 
     //Danh sách sản phảm nổi bật
     @GetMapping("/top-outstanding-products")
-    public ResponseEntity<List<Product>> getTopWishlistProducts(@RequestParam(defaultValue = "5") Integer limit) throws CustomException {
+    public ResponseEntity<DataResponse> getTopWishlistProducts(@RequestParam(defaultValue = "5") Integer limit) throws CustomException {
         List<Product> topWishlistProducts = wishListService.getTopWishlistProducts(limit);
-        return new ResponseEntity<>(topWishlistProducts, HttpStatus.OK);
+        return new ResponseEntity<>(new DataResponse(topWishlistProducts, HttpStatus.OK), HttpStatus.OK);
     }
-
 }

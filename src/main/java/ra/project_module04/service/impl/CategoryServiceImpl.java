@@ -1,13 +1,11 @@
 package ra.project_module04.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.CategoryRequest;
@@ -15,6 +13,7 @@ import ra.project_module04.model.entity.Category;
 import ra.project_module04.repository.ICategoryRepository;
 import ra.project_module04.repository.IProductRepository;
 import ra.project_module04.service.ICategoryService;
+
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -30,7 +29,13 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll();
+
+        if (categories.isEmpty()) {
+            throw new NoSuchElementException("Không có danh mục nào.");
+        }
+
+        return categories;
     }
 
     @Override
@@ -42,7 +47,7 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public Category addCategory(CategoryRequest category) throws CustomException {
         if (categoryRepository.existsByCategoryName(category.getCategoryName())) {
-            throw new CustomException("Tên danh mục đã tồn tại", HttpStatus.CONFLICT);
+            throw new CustomException("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST);
         }
 
         Category cate = Category.builder()
@@ -59,7 +64,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
         if (!existingCategory.getCategoryName().equals(category.getCategoryName())
                 && categoryRepository.existsByCategoryName(category.getCategoryName())) {
-            throw new CustomException("Tên danh mục đã tồn tại", HttpStatus.CONFLICT);
+            throw new CustomException("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST);
         }
 
         Category cate = Category.builder()
@@ -72,11 +77,11 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public void deleteCategory(Long id) throws CustomException {
+    public void deleteCategory(Long id){
         categoryRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Khong ton tai danh mục: " + id));
 
         if(productRepository.existsByCategory_Id(id)) {
-            throw new AccessDeniedException("Không thể xóa danh mục vì nó có sản phẩm");
+            throw new NoSuchElementException("Không thể xóa danh mục vì danh mục có sản phẩm");
         }
 
         categoryRepository.deleteById(id);

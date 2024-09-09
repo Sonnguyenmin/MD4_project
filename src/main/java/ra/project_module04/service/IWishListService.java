@@ -12,4 +12,5 @@ public interface IWishListService {
     List<WishListResponse> getAllWishList() throws CustomException;
     void deleteWishList(Long id) throws CustomException;
     List<Product> getTopWishlistProducts(Integer limit) throws CustomException;
+
 }

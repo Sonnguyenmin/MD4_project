@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import ra.project_module04.exception.CustomException;
 import ra.project_module04.model.dto.req.CategoryRequest;
 import ra.project_module04.model.entity.Category;
-import ra.project_module04.model.entity.Product;
 
 import java.util.List;
 

@@ -28,4 +28,6 @@ public class Address {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private Users users;
+
+    private Boolean isDefault = true;
 }
