@@ -18,10 +18,7 @@ public interface IOrderService {
     boolean updateOrderStatus(Long id, OrderStatus status) throws CustomException;
     List<Order> getAllUserOrders();
     Order getOrderBySerialNumber(String serialNumber);
-
     List<Order> getOrdersByStatus(OrderStatus orderStatus);
-
     boolean cancelOrder(Long id) throws CustomException;
-
     List<TopSellingProductResponse> getTopSellingProducts(Integer limit) throws CustomException;
 }
